@@ -24,26 +24,38 @@ import base64
 from lxml import etree
 import argparse
 
-filename = 'configuration-backupsettings.conf'
-#filename = 'foo.conf'
 header_len = 60
 header_pattern = '<compressed alg=lzw len=(\d+)>.+<crc=0x([0-9A-Fa-f]+)>'
-
-def print_user(u, p):
-    print("Username: {0}\t\tPassword: {1}".format(u, p))
 
 def decode_password(p):
     return base64.b64decode(p).decode('utf-8').rstrip('\x00')
 
-def extract_username_password(xmltree, xpath):
-    users = zip(xmltree.xpath('{0}/Username/text()'.format(xpath)), xmltree.xpath('{0}/Password/text()'.format(xpath)))
-    return set((username, decode_password(password)) for (username, password) in users)
-
 def extract_ppp_info(xmltree):
     return extract_username_password(xmltree, "//WANPPPConnection")
 
-def extract_users(xmltree):
-    return extract_username_password(xmltree, "//Users/User")
+def show_users(xmltree):
+    users = xmltree.xpath("//Use_Login_Info[@instance]")
+    if len(users) == 0:
+        log.warn("Found no users. Please report your configuration!")
+        return
+    print("Users configured on router: ")
+    for u in users:
+        username = u.xpath("./UserName/text()")
+        if len(username) == 0:
+            log.warn("Expected Username but didn't find one")
+            continue
+        username = username[0]
+        password = u.xpath("./Password/text()")
+        if len(password) == 0:
+            log.warn("Expected Password but didn't find one")
+            continue
+        password = password[0]
+        disabled = u.xpath("./Enable[text() = 'FALSE']")
+        if len(disabled) == 0:
+            disabled = ""
+        else:
+            disabled = "[DISABLED]"
+        print("Username: {0}\t\tPassword: {1}\t{2}".format(username, decode_password(password), disabled))
 
 def extract_wifi(xmltree):
     xpath = "//WLANConfiguration[not(./Enable = 'FALSE')]"
@@ -76,17 +88,32 @@ def extract_wifi(xmltree):
             wifi.append({ 'ssid' : ssid, 'auth': "WPA(2)-PSK", 'key': psk })
     return wifi 
 
-def show_users(xmltree):
-    print("Users configured on router: ")
-    router_users = extract_users(xmltree)
-    for (u, p) in router_users:
-        print_user(u, p)
-
 def show_ppp(xmltree):
     print("PPP configuration: ")
-    ppp_info = extract_ppp_info(xmltree)
-    for (u, p) in ppp_info:
-        print_user(u, p)
+    ppp = xmltree.xpath("//WANPPPConnection[@instance and not(./Enable = 'FALSE')]")
+    if len(ppp) == 0:
+        log.warn("Couldn't find any PPP Configuration Info")
+        return
+    logins = []
+    for p in ppp:
+        username = p.xpath("./Username/text()")
+        if len(username) == 0:
+            log.warn("Expected Username but none found")
+            continue
+        username = username[0]
+        password = p.xpath("./Password/text()")
+        if len(password) == 0:
+            log.warn("Expected Password but none found")
+            continue
+        password = password[0]
+        up = (username, decode_password(password))
+        if up not in logins:
+            log.info("Adding new username '{0}' with password '{1}'".format(up[0], up[1]))
+            logins.append(up)
+        else:
+            log.info("Username '{0}' with password '{1}' already exists. Skipping...".format(up[0], up[1]))
+    for u, p in logins:
+        print("Username: {0}\t\tPassword: {1}".format(u, p))
 
 def show_wifi(xmltree):
     print("Wifi info: ")
