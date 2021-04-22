@@ -17,11 +17,11 @@ This is a script to extract information such as Wifi SSID and Password (currentl
 
 ## Installation and Requirements
 
-This script relies on the `python-lzw` package for decompressing the LZW data. See the project page at https://github.com/joeatwork/python-lzw for how to install it.
+This script relies on the `python-lzw` package for decompressing the LZW data. See the project page at https://github.com/joeatwork/python-lzw for how to install it. The script is implemented in Python 3 (fwiw).
 
 ## Sample Usage and Output:
 ```
-$ python zyxel-passwd.py configuration-backupsettings.conf
+$ python ./zyxel-extract.py configuration-backupsettings.conf
 Users configured on router:
 Username: root		Password: 3peV!Nb1$54
 Username: admin		Password: turktelekom
@@ -32,6 +32,24 @@ Username: xyz824095721@ttnet		Password: 6b88OF73
 Wifi info:
 SSID: 'My Wifi'    Authentication: WPA(2)-PSK     Password: 'mysecret123'
 
+```
+### Additional Options
+```
+$ python ./zyxel-extract.py --help
+usage: zyxel-extract.py [-h] [-v] [--config | --users | --ppp | --wifi] filename
+
+Extract Username and Password information from ZyXel Modem backup file.
+
+positional arguments:
+  filename       Name of the backup file saved from the router. E.g. 'configuration-backupsettings.conf'
+
+optional arguments:
+  -h, --help     show this help message and exit
+  -v, --verbose  Provide more verbose output
+  --config       Dump XML tree of configuration
+  --users        Only show router user accounts
+  --ppp          Only show PPP information
+  --wifi         Only show Wifi information
 ```
 ## Known Issues
 
