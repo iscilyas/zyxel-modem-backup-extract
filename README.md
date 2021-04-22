@@ -30,14 +30,14 @@ The script is implemented in Python 3 (fwiw).
 ```
 $ python ./zyxel-extract.py configuration-backupsettings.conf
 Users configured on router:
-Username: root		Password: 3peV!Nb1$54
+Username: root		Password: 3peV!Nb1$54   	[DISABLED]
 Username: admin		Password: turktelekom
 
 PPP configuration:
 Username: xyz824095721@ttnet		Password: 6b88OF73
 
 Wifi info:
-SSID: 'My Wifi'    Authentication: WPA(2)-PSK     Password: 'mysecret123'
+SSID: 'My Wifi'    Authentication: psk psk2     Password: 'mysecret123'
 
 ```
 ### Additional Options
@@ -60,6 +60,6 @@ optional arguments:
 ```
 ## Known Issues
 
-Ths script has been tested using the configuration backup from a Zyxel VMG3313-B10A VDSL modem. Until it gets further exposure, I can't guarantee that it will work on yours.
+Ths script has been tested using the configuration backup from a Zyxel VMG3313-B10A VDSL modem (and a VMG3312-B10A). Until it gets further exposure, I can't guarantee that it will work on yours. Send me your configuration file if it isn't working for you.
 
 Also, I haven't (yet) had the opportunity to implement extracting WEP keys. If people are using WEP and need this functionality, send me a copy of your backup file and I'll add the code.
