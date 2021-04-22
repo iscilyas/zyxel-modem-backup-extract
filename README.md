@@ -17,7 +17,14 @@ This is a script to extract information such as Wifi SSID and Password (currentl
 
 ## Installation and Requirements
 
-This script relies on the `python-lzw` package for decompressing the LZW data. See the project page at https://github.com/joeatwork/python-lzw for how to install it. The script is implemented in Python 3 (fwiw).
+This script relies on the `python-lzw` package for decompressing the LZW data. See the project page at https://github.com/joeatwork/python-lzw for how to install it.
+
+It additionally requires the `lxml` package which can be installed by:
+```
+$ pip install lxml
+```
+
+The script is implemented in Python 3 (fwiw).
 
 ## Sample Usage and Output:
 ```
