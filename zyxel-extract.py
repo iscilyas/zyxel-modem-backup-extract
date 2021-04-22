@@ -58,34 +58,29 @@ def show_users(xmltree):
         print("Username: {0}\t\tPassword: {1}\t{2}".format(username, decode_password(password), disabled))
 
 def extract_wifi(xmltree):
-    xpath = "//WLANConfiguration[not(./Enable = 'FALSE')]"
+    xpath = "//WlVirtIntfCfg[@instance and not(./WlEnblSsid = '0')]"
     wifi = []
     mynodes = xmltree.xpath(xpath)
     for node in mynodes:
-        ssid = node.xpath("./SSID/text()")
+        ssid = node.xpath("./WlSsid/text()")
         if len(ssid) == 0:
-            log.info("Skipping Wifi node without SSID.")
+            log.warn("Skipping Wifi node without SSID.")
             continue
         ssid = ssid[0]
-        beacontype = node.xpath("./BeaconType/text()")
-        if len(beacontype) == 0:
-            log.warn("Can't find 'BeaconType' for ssid '{0}'".format(ssid))
-            continue
-        beacontype = beacontype[0]
-        if "WPA" in beacontype:
-            authmode = node.xpath("./WPAAuthenticationMode/text()")
-            if len(authmode) == 0:
-                log.warn("Can't find authentication mode for WPA ssid '{0}'".format(ssid))
-                continue
+        authmode = node.xpath("./WlAuthMode/text()")
+        if len(authmode) == 0:
+            log.warn("Can't find authentication mode for WPA ssid '{0}'".format(ssid))
+            authmode = "unknown"
+        else:
             authmode = authmode[0]
-            if authmode == "PSKAuthentication":
-                log.info("Found WPA/PSK(2) authentication")
-                psk = node.xpath("PreSharedKey[@instance]/PreSharedKey/text()")
-                if len(psk) == 0:
-                    log.warn("Can't find PreSharedKey for WPA ssid '{0}'".format(ssid))
-                    continue
-                psk = psk[0]
-            wifi.append({ 'ssid' : ssid, 'auth': "WPA(2)-PSK", 'key': psk })
+        if 'psk' in authmode:
+            log.info("Found WPA/PSK(2) authentication")
+            psk = node.xpath("./WlWpaPsk/text()")
+            if len(psk) == 0:
+                log.warn("Can't find PreSharedKey for WPA ssid '{0}'".format(ssid))
+                continue
+            psk = psk[0]
+        wifi.append({ 'ssid' : ssid, 'auth': authmode, 'key': psk })
     return wifi 
 
 def show_ppp(xmltree):
