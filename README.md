@@ -63,3 +63,7 @@ optional arguments:
 Ths script has been tested using the configuration backup from a Zyxel VMG3313-B10A VDSL modem (and a VMG3312-B10A). Until it gets further exposure, I can't guarantee that it will work on yours. Send me your configuration file if it isn't working for you.
 
 Also, I haven't (yet) had the opportunity to implement extracting WEP keys. If people are using WEP and need this functionality, send me a copy of your backup file and I'll add the code.
+
+## Additional Information
+
+See this very informative post: https://abrazalaweb.net/2018/11/descomprimir-archivos-de-configuracion-lzw/
